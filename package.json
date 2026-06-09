@@ -1,0 +1,24 @@
+{
+  "name": "qavant-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end, accessibility, i18n and SEO test suite for qavant.dev — treating a portfolio site like a production fintech app.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:smoke": "playwright test smoke",
+    "test:a11y": "playwright test accessibility",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://qavant.dev"
+  },
+  "keywords": ["playwright", "qa", "e2e", "accessibility", "i18n"],
+  "author": "Peter — Qavant",
+  "license": "MIT",
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.3"
+  }
+}

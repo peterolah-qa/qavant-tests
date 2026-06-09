@@ -1,0 +1,70 @@
+name: Playwright Tests
+
+# Quality gate + publisher: runs on every push/PR and daily, and writes a
+# status.json (test count, pass rate, run count) back to main so qavant.dev
+# can show REAL CI metrics. The push of status.json is path-ignored below so
+# it never re-triggers this workflow.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['status.json']
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to commit status.json back to the repo
+
+jobs:
+  test:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        id: tests
+        continue-on-error: true   # publish status even when tests fail
+        run: npm test
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://qavant.dev' }}
+
+      - name: Generate status.json
+        if: always()
+        run: node scripts/report-status.mjs
+
+      - name: Publish status.json to main
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          git config user.name "qavant-ci"
+          git config user.email "ci@qavant.dev"
+          git add status.json
+          git diff --staged --quiet || git commit -m "chore: update CI status [skip ci]"
+          git push
+
+      - name: Upload HTML report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Enforce test result
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "Tests failed — failing the build."
+          exit 1
