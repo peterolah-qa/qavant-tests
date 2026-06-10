@@ -29,6 +29,21 @@ test.describe('Smoke — the site loads and its skeleton is intact', () => {
     }
   });
 
+  test('ISTQB badge is a verifiable link to the official register', async ({ page }) => {
+    await page.goto('/');
+    const badge = page.locator(SEL.certBadge);
+
+    await expect(badge, 'cert badge should be visible in the hero on load').toBeVisible();
+    await expect(badge).toContainText('ISTQB');
+
+    // We assert the link CONTRACT (where it points and how it opens), not the
+    // destination itself — testing a third party's uptime would only make this
+    // suite flaky for reasons outside our control.
+    await expect(badge).toHaveAttribute('href', /^https:\/\/scr\.istqb\.org\/?$/);
+    await expect(badge).toHaveAttribute('target', '_blank');
+    await expect(badge, 'external link must carry rel=noopener').toHaveAttribute('rel', /noopener/);
+  });
+
   test('page loads without console errors or uncaught exceptions', async ({ page }) => {
     const errors: string[] = [];
     const badResponses: string[] = [];

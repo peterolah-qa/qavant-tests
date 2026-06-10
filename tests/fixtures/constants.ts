@@ -34,6 +34,7 @@ export const SEL = {
     message: '#message',
   },
   submit: 'form[name="contact"] button[type="submit"]',
+  certBadge: 'a.cert-badge',
 } as const;
 
 /** A known nav string per language — used to prove translation actually swapped. */
