@@ -52,8 +52,24 @@ jobs:
           git config user.name "qavant-ci"
           git config user.email "ci@qavant.dev"
           git add status.json
-          git diff --staged --quiet || git commit -m "chore: update CI status [skip ci]"
-          git push
+          git diff --staged --quiet && exit 0 || git commit -m "chore: update CI status [skip ci]"
+          # main may have moved while tests were running (someone pushed mid-run);
+          # rebase onto the latest main, keeping OUR status.json on conflict,
+          # then push. One retry is enough for this low-traffic repo.
+          git push || {
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push
+          }
+
+      # ---------- Playwright HTML report -> GitHub Pages (published on every run) ----------
+      - name: Publish report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: always() && github.event_name != 'pull_request'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: playwright-report
 
       - name: Upload HTML report
         if: ${{ !cancelled() }}
