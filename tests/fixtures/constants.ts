@@ -35,6 +35,17 @@ export const SEL = {
   },
   submit: 'form[name="contact"] button[type="submit"]',
   certBadge: 'a.cert-badge',
+  liveMetrics: '#liveMetrics',
+  metricUi: '#metricTests',
+  metricApi: '#metricApi',
+  demoUi: '.demo-tag.demo-ui',
+  demoApi: '.demo-tag.demo-api',
+} as const;
+
+/** The CI status feeds the site reads for its live metrics widget. */
+export const METRICS = {
+  ui:  'https://raw.githubusercontent.com/peterolah-qa/qavant-tests/main/status.json',
+  api: 'https://raw.githubusercontent.com/peterolah-qa/qavant-api-tests/main/status.json',
 } as const;
 
 /** A known nav string per language — used to prove translation actually swapped. */
