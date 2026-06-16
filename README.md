@@ -1,4 +1,8 @@
 # qavant-tests
+[![Playwright Tests](https://github.com/peterolah-qa/qavant-tests/actions/workflows/playwright.yml/badge.svg)](https://github.com/peterolah-qa/qavant-tests/actions/workflows/playwright.yml)
+
+
+📊 **[Live test report →](https://peterolah-qa.github.io/qavant-tests/)**
 
 End-to-end, accessibility, i18n and SEO test suite for **[qavant.dev](https://qavant.dev)** —
 written with Playwright + TypeScript.
