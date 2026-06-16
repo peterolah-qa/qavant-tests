@@ -64,10 +64,29 @@ npm run test:visual:update  # generate / refresh visual baselines
 Switch environment (defaults to prod, so CI stays a synthetic monitor):
 
 ```bash
-ENV=prod npm test                 # https://qavant.dev (default)
-ENV=qa   npm test                 # local / staging build
-BASE_URL=http://localhost:8000 npm test   # one-off override (wins over ENV)
+npm test            # = ENV=prod, runs against https://qavant.dev (default)
+npm run test:prod   # explicit prod
+npm run test:qa     # ENV=qa, runs against a local copy on :8000
+BASE_URL=http://localhost:3000 npm test   # one-off override (wins over ENV)
 ```
+
+### Running the QA target locally
+
+`ENV=qa` points at `http://localhost:8000`, so a local copy of the site has to be
+served first. The site is static, so any static server works (no install needed):
+
+```bash
+# terminal 1 — serve the site repo on :8000
+cd ../qavant            # the website repo
+python3 -m http.server 8000
+
+# terminal 2 — run the suite against it
+cd ../qavant-tests
+npm run test:qa
+```
+
+Stop the server with Ctrl+C when done. In a real project `qa` would be a deployed
+staging build; locally this stands in for it and proves the env switch works.
 
 ## CI
 
