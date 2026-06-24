@@ -1,9 +1,5 @@
 name: Playwright Tests
 
-# Quality gate + publisher: runs on every push/PR and daily, and writes a
-# status.json (test count, pass rate, run count) back to main so qavant.dev
-# can show REAL CI metrics. The push of status.json is path-ignored below so
-# it never re-triggers this workflow.
 on:
   push:
     branches: [main]
@@ -15,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # needed to commit status.json back to the repo
+  contents: write
 
 jobs:
   test:
@@ -35,3 +31,24 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        run: npm ci
+
+      - name: Run Playwright tests
+        id: tests
+        continue-on-error: true
+        run: npm test
+        env:
+          BASE_URL: ${{ vars.BASE_URL || 'https://qavant.dev' }}
+          HOME: /root
+
+      - name: Generate status.json
+        if: always()
+        run: node scripts/report-status.mjs
+
+      - name: Publish status.json to main
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          git config user.name "qavant-ci"
+          git config user.email "ci@qavant.dev"
+          git add status.json
+          git diff --staged --quiet && exit 0 || git
