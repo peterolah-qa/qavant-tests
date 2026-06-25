@@ -47,8 +47,18 @@ jobs:
 
       - name: Publish status.json to main
         if: always() && github.event_name != 'pull_request'
+        continue-on-error: true
         run: |
           git config user.name "qavant-ci"
           git config user.email "ci@qavant.dev"
           git add status.json
-          git diff --staged --quiet && exit 0 || git
+          if git diff --staged --quiet; then
+            echo "No status.json changes to publish."
+            exit 0
+          fi
+          git commit -m "ci: update status.json [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && break
+            echo "push attempt $i failed, retrying..."
+            sleep 3
+          done
