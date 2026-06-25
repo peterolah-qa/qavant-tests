@@ -23,12 +23,12 @@ const isCI = !!process.env.CI;
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 90_000,            // live site over CI network + axe-core needs headroom
+  timeout: 90_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
-  forbidOnly: isCI,            // a stray test.only fails the CI build
+  forbidOnly: isCI,
   retries: isCI ? 2 : 1,
-  workers: 2,                 // cap parallelism: 5 heavy browsers on a live site starve each other
+  workers: 2,
   reporter: isCI
     ? [['github'], ['html', { open: 'never' }], ['json', { outputFile: 'results.json' }], ['list']]
     : [['html', { open: 'never' }], ['json', { outputFile: 'results.json' }], ['list']],
@@ -39,14 +39,16 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     actionTimeout: 10_000,
-    navigationTimeout: 45_000,  // CI runner -> live qavant.dev can be slow to first byte
+    navigationTimeout: 45_000,
   },
 
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
+    { name: 'chromium',      use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox',       use: { ...devices['Desktop Firefox'] } },
     { name: 'mobile-chrome', use: { ...devices['Pixel 5'] } },
-    { name: 'mobile-safari', use: { ...devices['iPhone 13'] } },
+    ...(isCI ? [] : [
+      { name: 'webkit',        use: { ...devices['Desktop Safari'] } },
+      { name: 'mobile-safari', use: { ...devices['iPhone 13'] } },
+    ]),
   ],
 });
