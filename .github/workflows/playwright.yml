@@ -56,6 +56,7 @@ jobs:
       # numbers. That is the exact failure mode this suite is meant to catch.
       - name: Publish status.json to main
         if: always() && github.event_name != 'pull_request'
+        shell: bash
         run: |
           set -euo pipefail
           git config user.name  "qavant-ci"
