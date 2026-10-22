@@ -8,7 +8,6 @@ export type Lang = (typeof LANGS)[number];
 export const SECTIONS = [
   'services',
   'showcase',
-  'interlude',
   'about',
   'mission',
   'process',
